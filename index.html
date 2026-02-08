@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Valentine 💖</title>
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Pacifico&family=Poppins&display=swap');
+*{margin:0;padding:0;box-sizing:border-box;}
+body{
+min-height:100vh;
+display:flex;
+justify-content:center;
+align-items:center;
+font-family:Poppins;
+background:linear-gradient(135deg,#cdb4ff,#ffc8dd,#ffafcc,#bde0fe);
+background-size:400% 400%;
+animation:bg 10s infinite alternate;
+overflow:hidden;
+padding:20px;
+}
+@keyframes bg{to{background-position:100% 100%;}}
+.container{width:100%;max-width:420px;}
+.card,.success{
+background:white;
+padding:clamp(18px,4vw,28px);
+border-radius:28px;
+text-align:center;
+box-shadow:0 0 40px rgba(255,120,200,.4);
+animation:pop .8s ease;
+}
+@keyframes pop{from{opacity:0;transform:scale(.7);} }
+h1{
+font-family:Pacifico;
+font-size:clamp(26px,5vw,36px);
+color:#ff4fa3;
+margin:10px 0;
+}
+h2{color:#9b5de5;}
+p{color:#9b5de5;font-size:14px}
+.buttons{
+position:relative;
+height:200px;
+margin-top:15px;
+}
+button{
+padding:12px 30px;
+border:none;
+border-radius:50px;
+font-size:16px;
+cursor:pointer;
+}
+.yes{
+background:linear-gradient(45deg,#ff5fa2,#c77dff);
+color:white;
+animation:pulse 1s infinite alternate;
+position:relative;
+z-index:10;
+}
+@keyframes pulse{to{transform:scale(1.1);} }
+#no{
+position:absolute;
+left:50%;
+top:90px;
+transform:translateX(-50%);
+background:#eee;
+z-index:5;
+pointer-events:none;
+/* Smooth slower movement */
+transition: left 0.4s ease, top 0.4s ease;
+}
+.success{display:none;}
+.hugscene{
+width:100%;
+max-width:220px;
+margin:20px auto;
+animation:bounce 3s infinite;
+}
+@keyframes bounce{80%{transform:translateY(-8px);} }
+.hugscene img{
+width:100%;
+animation:alive 2s infinite;
+}
+@keyframes alive{50%{transform:scale(1.05);} }
+.heart,.bgheart{
+position:fixed;
+bottom:-30px;
+animation:float linear infinite;
+}
+@keyframes float{
+to{transform:translateY(-120vh);opacity:0;}
+}
+.bgheart{opacity:.4}
+@media(max-width:420px){
+.buttons{height:220px;}
+}
+</style>
+</head>
+<body>
+<div class="container">
+<div class="card" id="card">
+<h2>Jemima Blessy 💕</h2>
+<h1>Will you be my Valentine? 💓</h1>
+<div class="buttons" id="area">
+<button class="yes" onclick="yes()">YES 💖</button>
+<button id="no">NO 🙈</button>
+</div>
+<p id="msg"></p>
+</div>
+<div class="success" id="success">
+<h1>Yayy! 💖 Valentine 
+locked 🔒</h1>
+<div class="hugscene">
+<img src="hug.png">
+</div>
+<h2>💞🤗You are Everything🤗💞</h2>
+<p>Never Ever leave Alone🤗</p>
+</div>
+</div>
+
+<script>
+const no=document.getElementById("no");
+const area=document.getElementById("area");
+const msg=document.getElementById("msg");
+const yesBtn=document.querySelector(".yes");
+const card=document.getElementById("card");
+const success=document.getElementById("success");
+
+const texts=["Are you sure? 🥺","Think twice","My heart brokes💔","Pretty please 😭","Think again 😜","Say YES 😍"];
+let i=0;
+
+// Function to move NO button randomly
+function moveNo(){
+    const w=area.clientWidth-no.offsetWidth;
+    const h=area.clientHeight-no.offsetHeight;
+    let x,y;
+    const yesRect=yesBtn.getBoundingClientRect();
+    const areaRect=area.getBoundingClientRect();
+    do{
+        x=Math.random()*w;
+        y=Math.random()*h;
+    } while(
+        x+areaRect.left>yesRect.left-80 &&
+        x+areaRect.left<yesRect.right+80 &&
+        y+areaRect.top>yesRect.top-80 &&
+        y+areaRect.top<yesRect.bottom+80
+    );
+    no.style.left=x+"px";
+    no.style.top=y+"px";
+    msg.innerText=texts[i++%texts.length];
+}
+
+// Only move NO if cursor/touch is near
+function isNearNo(x, y){
+    const noRect=no.getBoundingClientRect();
+    const padding=80;
+    return (
+        x > noRect.left - padding &&
+        x < noRect.right + padding &&
+        y > noRect.top - padding &&
+        y < noRect.bottom + padding
+    );
+}
+
+// Throttle NO button movement
+let lastMove = 0;
+const moveDelay = 400; // ms
+
+function moveNoThrottled(){
+    const now = Date.now();
+    if(now - lastMove > moveDelay){
+        moveNo();
+        lastMove = now;
+    }
+}
+
+// Event listeners with throttling
+document.addEventListener("mousemove", (e) => {
+    if(isNearNo(e.clientX, e.clientY)) moveNoThrottled();
+});
+document.addEventListener("touchstart", (e) => {
+    const touch = e.touches[0];
+    if(isNearNo(touch.clientX, touch.clientY)) moveNoThrottled();
+});
+document.addEventListener("touchmove", (e) => {
+    const touch = e.touches[0];
+    if(isNearNo(touch.clientX, touch.clientY)) moveNoThrottled();
+});
+
+// YES button logic
+function yes(){
+    card.style.display="none";
+    success.style.display="block";
+    for(let i=0;i<40;i++) heart();
+}
+
+// Floating hearts on YES
+function heart(){
+    const h=document.createElement("div");
+    h.className="heart";
+    h.innerHTML="💗";
+    h.style.left=Math.random()*100+"vw";
+    h.style.fontSize=14+Math.random()*20+"px";
+    h.style.animationDuration=3+Math.random()*3+"s";
+    document.body.appendChild(h);
+    setTimeout(()=>h.remove(),6000);
+}
+
+// Background hearts
+for(let i=0;i<25;i++){
+    const b=document.createElement("div");
+    b.className="bgheart";
+    b.innerHTML="💞";
+    b.style.left=Math.random()*100+"vw";
+    b.style.fontSize=12+Math.random()*16+"px";
+    b.style.animationDuration=8+Math.random()*6+"s";
+    document.body.appendChild(b);
+}
+</script>
+</body>
+</html>
